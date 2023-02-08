@@ -1,13 +1,11 @@
-<h1>Test</h1>
 <section>
-  <div class="container">
-    <label for="">
-      <p>storage</p>
-      <input type="range" name="storage" id="" min="0" max="1000"
-    /></label>
-    <label for="">
-      <p>transfer</p>
-      <input type="range" name="transfer" id="" min="0" max="1000"
-    /></label>
-  </div>
+  <label for="storage">Storage: </label>
+  <input id="storage" type="range" step="1" min="0" max="1000" value="100" />
+  <!-- <output >0</output> -->
+  <p><span id="storageValue">100 </span> GB</p>
+
+  <label for="transfer">Transfer</label>
+  <input id="transfer" type="range" step="1" min="0" max="1000" value="100" />
+  <p><span id="transferValue">100 </span> GB</p>
+  <!-- <output id="transferValue">0</output> -->
 </section>
