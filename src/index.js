@@ -4,6 +4,11 @@ const transferInput = document.querySelector('#transfer');
 const transfer = document.querySelector('#transferValue');
 const form = document.querySelector('form');
 
+const bunnyRadioButtons = document.querySelectorAll('input[name="bunny"]');
+const scalewayRadioButtons = document.querySelectorAll(
+  'input[name="scaleway"]'
+);
+
 // storageInput.addEventListener(
 //   'input',
 //   () => (storage.innerText = storageInput.value)
@@ -29,15 +34,32 @@ function handleInput(e) {
     parseInt(transfer.innerText)
   );
   console.log(res);
+
   // console.log(parseInt(storage.innerText));
   // console.log(parseInt(transfer.innerText));
 
-  function calculateCost(storage, transfer) {
+  function getBackblazePrice(storage, transfer) {
     const backblazePrice = getFactPrice(storage, transfer, 0.005, 0.01);
-    const backblazeCost = backblazePrice <= 7 ? 7 : backblazePrice;
+    return backblazePrice <= 7 ? 7 : backblazePrice;
+  }
 
-    const bunnyPrice = getFactPrice(storage, transfer, 0.01, 0.01); //if hhd
-    const bunnyCost = bunnyPrice < 10 ? bunnyPrice : 10;
+  function getBunnyPrice(storage, transfer) {
+    const bunnyRadioButtons = document.querySelectorAll('input[name="bunny"]');
+    let dataStorageDevice = 'hdd';
+    for (let i of bunnyRadioButtons) {
+      if (i.checked) {
+        dataStorageDevice = i.value;
+        break;
+      }
+    }
+    const storagePrice = dataStorageDevice === 'hdd' ? 0.01 : 0.02;
+    const bunnyPrice = getFactPrice(storage, transfer, storagePrice, 0.01);
+    return bunnyPrice < 10 ? bunnyPrice : 10;
+  }
+
+  function calculateCost(storage, transfer) {
+    const backblazeCost = getBackblazePrice(storage, transfer);
+    const bunnyCost = getBunnyPrice(storage, transfer);
 
     const scalewayfreeStorage = storage <= 75 ? 0 : storage - 75; //if multi
     const scalewayfreeTransfer = transfer <= 75 ? 0 : transfer - 75; //if multi
@@ -62,3 +84,10 @@ function handleInput(e) {
     return +(storage * sValue + transfer * tValue).toFixed(2);
   }
 }
+
+// const fruits = document.querySelectorAll('input[name="fruit"]')
+// for (const f of fruits) {
+//   if (f.checked) {
+//     console.log(f.value)
+//   }
+// }
