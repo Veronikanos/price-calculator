@@ -1,8 +1,13 @@
+import Chart from 'chart.js/auto';
+// import barChart from './chart'
+
 const storageInput = document.querySelector('#storage');
 const storage = document.querySelector('#storageValue');
 const transferInput = document.querySelector('#transfer');
 const transfer = document.querySelector('#transferValue');
 const form = document.querySelector('form');
+
+const popCanvas = document.getElementById('myChart');
 
 const bunnyRadioButtons = document.querySelectorAll(
   'input[type=radio][name="bunny"]'
@@ -11,7 +16,7 @@ const scalewayRadioButtons = document.querySelectorAll(
   'input[type=radio][name="scaleway"]'
 );
 
-console.log(bunnyRadioButtons);
+// console.log(bunnyRadioButtons);
 
 const getFactPrice = (storage, transfer, sValue, tValue) => {
   return +(storage * sValue + transfer * tValue).toFixed(2);
@@ -57,14 +62,56 @@ const calculateCost = (storage, transfer) => {
   const scalewayCost = getScalewayPrice(storage, transfer);
   const vultrCost = getVultrPrice(storage, transfer);
 
-  const priceRange = [backblazeCost, bunnyCost, scalewayCost, vultrCost];
+  return [backblazeCost, bunnyCost, scalewayCost, vultrCost];
   // let minPrice = Math.min(...priceRange);
   // let color = priceRange[0] === minPrice ? 'red' : 'default';
+};
 
-  return priceRange;
+let providers = {
+  backblaze: 'red',
+  bunny: 'orange',
+  scaleway: 'blueviolet',
+  vultr: 'cornflowerblue',
+};
+const countAndRenderChart = () => {
+  let priceRange = calculateCost(
+    parseInt(storage.innerText),
+    parseInt(transfer.innerText)
+  );
+  // let labels = ['backblaze', 'bunny', 'scaleway', 'vultr'];
+  // let colors = ['red', 'orange', 'blueviolet', 'cornflowerblue'];
+
+  let minPrice = Math.min(...priceRange);
+  let index = priceRange.indexOf(minPrice);
+  // colors.map();
+  console.log(index);
+  console.log(Object.values(providers));
+  let colors = Object.values(providers).map((item, i) => {
+    console.log(i);
+    return (item = i != index ? 'grey' : item);
+    // return item;
+  });
+  console.log(colors);
+
+  // showBar(res);
+  barChart = new Chart(popCanvas, {
+    type: 'bar',
+    // type: 'horizontalBar',
+    data: {
+      labels: Object.keys(providers),
+      datasets: [
+        {
+          label: 'Price',
+          data: priceRange,
+          backgroundColor: colors,
+        },
+      ],
+    },
+  });
 };
 
 const handleInput = e => {
+  if (barChart) barChart.destroy();
   if (e.target.tagName !== 'INPUT') {
     return;
   }
@@ -73,13 +120,13 @@ const handleInput = e => {
   } else if (e.target.name === 'transfer') {
     transfer.innerText = transferInput.value;
   }
-  let res = calculateCost(
-    parseInt(storage.innerText),
-    parseInt(transfer.innerText)
-  );
-  console.log(res);
+  countAndRenderChart();
 };
 
+(() => {
+  let barChart = null;
+  countAndRenderChart();
+})();
 // Listeners
 
 form.addEventListener('input', handleInput);
