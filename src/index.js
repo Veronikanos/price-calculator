@@ -1,12 +1,13 @@
 import Chart from 'chart.js/auto';
-// import barChart from './chart'
+import debounce from 'lodash.debounce';
+import { providers } from './js/constants';
+import { config } from './js/chart';
 
 const storageInput = document.querySelector('#storage');
 const storage = document.querySelector('#storageValue');
 const transferInput = document.querySelector('#transfer');
 const transfer = document.querySelector('#transferValue');
 const form = document.querySelector('form');
-
 const popCanvas = document.getElementById('myChart');
 
 const bunnyRadioButtons = document.querySelectorAll(
@@ -15,8 +16,6 @@ const bunnyRadioButtons = document.querySelectorAll(
 const scalewayRadioButtons = document.querySelectorAll(
   'input[type=radio][name="scaleway"]'
 );
-
-// console.log(bunnyRadioButtons);
 
 const getFactPrice = (storage, transfer, sValue, tValue) => {
   return +(storage * sValue + transfer * tValue).toFixed(2);
@@ -63,51 +62,22 @@ const calculateCost = (storage, transfer) => {
   const vultrCost = getVultrPrice(storage, transfer);
 
   return [backblazeCost, bunnyCost, scalewayCost, vultrCost];
-  // let minPrice = Math.min(...priceRange);
-  // let color = priceRange[0] === minPrice ? 'red' : 'default';
 };
 
-let providers = {
-  backblaze: 'red',
-  bunny: 'orange',
-  scaleway: 'blueviolet',
-  vultr: 'cornflowerblue',
-};
 const countAndRenderChart = () => {
   let priceRange = calculateCost(
     parseInt(storage.innerText),
     parseInt(transfer.innerText)
   );
-  // let labels = ['backblaze', 'bunny', 'scaleway', 'vultr'];
-  // let colors = ['red', 'orange', 'blueviolet', 'cornflowerblue'];
 
   let minPrice = Math.min(...priceRange);
   let index = priceRange.indexOf(minPrice);
-  // colors.map();
-  console.log(index);
-  console.log(Object.values(providers));
-  let colors = Object.values(providers).map((item, i) => {
-    console.log(i);
-    return (item = i != index ? 'grey' : item);
-    // return item;
-  });
-  console.log(colors);
 
-  // showBar(res);
-  barChart = new Chart(popCanvas, {
-    type: 'bar',
-    // type: 'horizontalBar',
-    data: {
-      labels: Object.keys(providers),
-      datasets: [
-        {
-          label: 'Price',
-          data: priceRange,
-          backgroundColor: colors,
-        },
-      ],
-    },
+  let colors = Object.values(providers).map((item, i) => {
+    return (item = i != index ? 'grey' : item);
   });
+
+  barChart = new Chart(popCanvas, config(colors, providers, priceRange));
 };
 
 const handleInput = e => {
@@ -123,13 +93,14 @@ const handleInput = e => {
   countAndRenderChart();
 };
 
+let barChart = null;
 (() => {
-  let barChart = null;
   countAndRenderChart();
 })();
+
 // Listeners
 
-form.addEventListener('input', handleInput);
+form.addEventListener('input', debounce(handleInput, 100));
 
 bunnyRadioButtons.forEach(radio =>
   radio.addEventListener('change', handleInput)
