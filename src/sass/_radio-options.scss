@@ -1,0 +1,77 @@
+.radio-options {
+  width: 100%;
+  @media screen and (min-width: 768px) {
+    font-size: $main-font;
+    max-width: 200px;
+    display: flex;
+    align-items: stretch;
+    padding: 38px 0 53px;
+    height: 320px;
+  }
+
+  &__list {
+    text-align: center;
+    padding-left: 12%;
+    padding-right: 2%;
+    display: flex;
+    align-items: flex-end;
+    font-size: $mobile-font;
+
+    justify-content: space-between;
+    @media screen and (min-width: 340px) {
+      padding-right: 5%;
+    }
+    @media screen and (min-width: 560px) {
+      padding-right: 7%;
+    }
+
+    @media screen and (min-width: 767px) {
+      width: 100%;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: start;
+    }
+  }
+  &__item {
+    width: 50px;
+    min-width: 40px;
+    @media screen and (min-width: 767px) {
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      gap: 20px;
+    }
+
+    & label {
+      display: block;
+      @media screen and (min-width: 767px) {
+        display: inline-block;
+      }
+    }
+    .label-wrapper {
+      margin-bottom: 10px;
+      @media screen and (min-width: 767px) {
+        margin-top: auto;
+        margin-bottom: auto;
+      }
+    }
+  }
+
+  &__logo {
+    width: 30px;
+    height: 30px;
+    @media screen and (min-width: 767px) {
+    }
+  }
+}
+
+.multi-radio,
+.hdd-radio {
+  @media screen and (min-width: 767px) {
+    margin-right: 10px;
+  }
+}
+
+.radio-options__wrapper {
+  display: flex;
+}

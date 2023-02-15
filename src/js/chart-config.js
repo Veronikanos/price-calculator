@@ -1,7 +1,4 @@
-import Chart from 'chart.js/auto';
-// const popCanvas = document.getElementById('myChart');
-
-export const config = (colors, providers, priceRange) => {
+export const config = (colors, providers, priceRange, axis) => {
   return {
     type: 'bar',
     data: {
@@ -15,24 +12,19 @@ export const config = (colors, providers, priceRange) => {
       ],
     },
     options: {
-      indexAxis: 'y',
-      // Elements options apply to all of the options unless overridden in a dataset
-      // In this case, we are setting the border of each horizontal bar to be 2px wide
+      indexAxis: `${axis}`,
       elements: {
         bar: {
           borderWidth: 2,
         },
       },
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: {
           display: false,
           position: 'right',
         },
-        // title: {
-        //   display: true,
-        //   text: 'Chart.js Horizontal Bar Chart',
-        // },
       },
     },
   };

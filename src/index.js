@@ -1,7 +1,7 @@
 import Chart from 'chart.js/auto';
 import debounce from 'lodash.debounce';
 import { providers } from './js/constants';
-import { config } from './js/chart';
+import { config } from './js/chart-config';
 
 const storageInput = document.querySelector('#storage');
 const storage = document.querySelector('#storageValue');
@@ -64,6 +64,18 @@ const calculateCost = (storage, transfer) => {
   return [backblazeCost, bunnyCost, scalewayCost, vultrCost];
 };
 
+const handleChartView = (colors, providers, priceRange) => {
+  // change chart view from horizontal to vertical and vice versa depends on screen width;
+  const indexAxis = barChart.config.options.indexAxis || 'x';
+
+  if (indexAxis === 'y' && window.innerWidth < 768) {
+    barChart.destroy();
+    barChart = new Chart(popCanvas, config(colors, providers, priceRange, 'x'));
+    return true;
+  }
+  return false;
+};
+
 const countAndRenderChart = () => {
   let priceRange = calculateCost(
     parseInt(storage.innerText),
@@ -77,7 +89,8 @@ const countAndRenderChart = () => {
     return (item = i != index ? 'grey' : item);
   });
 
-  barChart = new Chart(popCanvas, config(colors, providers, priceRange));
+  barChart = new Chart(popCanvas, config(colors, providers, priceRange, 'y'));
+  handleChartView(colors, providers, priceRange);
 };
 
 const handleInput = e => {
@@ -99,7 +112,7 @@ let barChart = null;
 })();
 
 // Listeners
-
+body.addEventListener('resize', resizeChart);
 form.addEventListener('input', debounce(handleInput, 100));
 
 bunnyRadioButtons.forEach(radio =>
