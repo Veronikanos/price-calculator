@@ -125,6 +125,11 @@ const handleInput = e => {
   countAndRenderChart();
 };
 
+const handleResize = () => {
+  if (barChart) barChart.destroy();
+  countAndRenderChart();
+};
+
 let barChart = null;
 (() => {
   countAndRenderChart();
@@ -132,6 +137,7 @@ let barChart = null;
 
 // Listeners
 form.addEventListener('input', debounce(handleInput, 300));
+window.addEventListener('resize', debounce(handleResize, 300));
 
 bunnyRadioButtons.forEach(radio =>
   radio.addEventListener('change', handleInput)
