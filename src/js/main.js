@@ -2,6 +2,7 @@ import Chart from 'chart.js/auto';
 import debounce from 'lodash.debounce';
 import { providers } from './constants';
 import { config } from './chart-config';
+import { data } from './data';
 
 const storageInput = document.querySelector('#storage');
 const storage = document.querySelector('#storageValue');
@@ -17,49 +18,67 @@ const scalewayRadioButtons = document.querySelectorAll(
   'input[type=radio][name="scaleway"]'
 );
 
-const getFactPrice = (storage, transfer, sValue, tValue) => {
-  return +(storage * sValue + transfer * tValue).toFixed(2);
+const getFactPrice = (sValue, tValue) => {
+  const storageInput = parseInt(storage.innerText);
+  const transferInput = parseInt(transfer.innerText);
+  return +(storageInput * sValue + transferInput * tValue).toFixed(2);
 };
 
-const getBackblazePrice = (storage, transfer) => {
-  const backblazePrice = getFactPrice(storage, transfer, 0.005, 0.01);
-  return backblazePrice <= 7 ? 7 : backblazePrice;
+const getBackblazePrice = () => {
+  const { storage, transfer, min } = data.find(item =>
+    item.name.includes('backblaze')
+  );
+
+  const backblazePrice = getFactPrice(storage, transfer);
+  return backblazePrice <= min ? min : backblazePrice;
 };
 
-const getBunnyPrice = (storage, transfer) => {
-  let dataStorageDevice = document.querySelector(
+const getBunnyPrice = () => {
+  const dataStorageDevice = document.querySelector(
     'input[name="bunny"]:checked'
   ).value;
-  const storagePrice = dataStorageDevice === 'hdd' ? 0.01 : 0.02;
-  const bunnyPrice = getFactPrice(storage, transfer, storagePrice, 0.01);
-  return bunnyPrice < 10 ? bunnyPrice : 10;
+
+  const { storage, transfer, max } = data.find(item =>
+    item.name.includes('bunny')
+  );
+  const storagePrice = dataStorageDevice === 'hdd' ? storage.HDD : storage.SSD;
+  const bunnyPrice = getFactPrice(storagePrice, transfer);
+  return bunnyPrice < max ? bunnyPrice : max;
 };
 
-const getScalewayPrice = (storage, transfer) => {
+const getScalewayPrice = () => {
   let dataStorageUsers = document.querySelector(
     'input[name="scaleway"]:checked'
   ).value;
-  const storagePrice = dataStorageUsers === 'multi' ? 0.06 : 0.03;
-  const scalewayfreeStorage = storage <= 75 ? 0 : storage - 75;
-  const scalewayfreeTransfer = transfer <= 75 ? 0 : transfer - 75;
-  return getFactPrice(
-    scalewayfreeStorage,
-    scalewayfreeTransfer,
-    storagePrice,
-    0.02
+
+  const prices = data.find(item => item.name.includes('scaleway'));
+
+  const storagePrice =
+    dataStorageUsers === 'multi' ? prices.storage.multi : prices.storage.single;
+  const scalewayfreeStorage =
+    parseInt(storage.innerText) <= 75 ? 0 : parseInt(storage.innerText) - 75;
+  const scalewayfreeTransfer =
+    parseInt(transfer.innerText) <= 75 ? 0 : parseInt(transfer.innerText) - 75;
+  return +(
+    scalewayfreeStorage * storagePrice +
+    scalewayfreeTransfer * prices.transfer
+  ).toFixed(2);
+};
+
+const getVultrPrice = () => {
+  const { storage, transfer, min } = data.find(item =>
+    item.name.includes('vultr')
   );
+
+  const vultrPrice = getFactPrice(storage, transfer);
+  return vultrPrice <= min ? min : vultrPrice;
 };
 
-const getVultrPrice = (storage, transfer) => {
-  const vultrPrice = getFactPrice(storage, transfer, 0.01, 0.01);
-  return vultrPrice <= 5 ? 5 : vultrPrice;
-};
-
-const calculateCost = (storage, transfer) => {
-  const backblazeCost = getBackblazePrice(storage, transfer);
-  const bunnyCost = getBunnyPrice(storage, transfer);
-  const scalewayCost = getScalewayPrice(storage, transfer);
-  const vultrCost = getVultrPrice(storage, transfer);
+const calculateCost = () => {
+  const backblazeCost = getBackblazePrice();
+  const bunnyCost = getBunnyPrice();
+  const scalewayCost = getScalewayPrice();
+  const vultrCost = getVultrPrice();
 
   return [backblazeCost, bunnyCost, scalewayCost, vultrCost];
 };
@@ -75,10 +94,7 @@ const handleChartView = (colors, providers, priceRange) => {
 };
 
 const countAndRenderChart = () => {
-  let priceRange = calculateCost(
-    parseInt(storage.innerText),
-    parseInt(transfer.innerText)
-  );
+  let priceRange = calculateCost();
 
   let minPrice = Math.min(...priceRange);
   let index = priceRange.indexOf(minPrice);
@@ -103,10 +119,8 @@ const handleInput = e => {
 
   if (e.target.name === 'storage') {
     storage.innerText = storageInput.value;
-    localStorage.setItem('storage', storageInput.value);
   } else if (e.target.name === 'transfer') {
     transfer.innerText = transferInput.value;
-    localStorage.setItem('transfer', transferInput.value);
   }
   countAndRenderChart();
 };
@@ -117,7 +131,7 @@ let barChart = null;
 })();
 
 // Listeners
-form.addEventListener('input', debounce(handleInput, 100));
+form.addEventListener('input', debounce(handleInput, 300));
 
 bunnyRadioButtons.forEach(radio =>
   radio.addEventListener('change', handleInput)

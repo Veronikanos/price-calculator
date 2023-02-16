@@ -18,7 +18,8 @@ Live page [here](https://veronikanos.github.io/price-calculator/).
 5. The column with the lowest price of the provider's color (red, orange,
    purple, blue). Other columns are gray.
 
-Used JavaScript, Parcel, Chart.js library. Styled with scss.
+Used JavaScript, Parcel, Chart.js library. Styled with scss. Used
+lodash.debounce library to optimize graphics redrawing
 
 ### View on narrow screens (up to 768px)
 

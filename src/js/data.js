@@ -1,4 +1,4 @@
-export const providers = [
+export const data = [
   {
     name: 'backblaze.com',
     min: 7,
@@ -18,7 +18,6 @@ export const providers = [
   {
     // має бути можливість переключатись між опціями Multi та Single.
     name: 'scaleway.com',
-    min: 7,
     storage: {
       multi: 0.06,
       single: 0.03, //Multi - 75 GB безкоштовно, потім $0.06.	Single - 75 GB безкоштовно, потім $0.03.
